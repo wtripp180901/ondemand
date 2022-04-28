@@ -1,4 +1,11 @@
-
+<script type="text/javascript">
+  function goto(url) {
+    popUpObj=window.open(url,"ModalPopUp","width=800," + "height=600");
+    popUpObj.focus();
+  }
+</script>
+<%= attrib.inspect %>
+<hr/>
 <%= label attrib.id, "#{field_options[:label]}" %>
 <%= text_field :batch_connect_session_context, attrib.id, class: 'form-control' %>
-<%= button_tag 'Select Path', type: 'button', class: 'btn btn-primary', style: 'margin-top: 15px;', onclick: 'alert("Onclick Works Properly!");' %>
+<%= button_tag 'Select Path', type: 'button', class: 'btn btn-primary', style: 'margin-top: 15px;', onclick: 'goto("/pun/dev/dashboard/files/fs/users/PZS0714/gbyrket");' %>

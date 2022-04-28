@@ -22,7 +22,7 @@ module BatchConnect::SessionContextsHelper
     when 'file_navigator'
       if Configuration.file_navigator?
         form.form_group attrib.id, help: field_options[:help] do
-          render :partial => "file_navigator", :locals => { attrib: attrib, field_options: field_options }
+          render :partial => "file_navigator", :locals => { attrib: attrib, field_options: field_options, all_options: all_options }
         end
       else
         form.send widget, attrib.id, all_options
