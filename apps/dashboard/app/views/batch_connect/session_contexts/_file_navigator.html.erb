@@ -1,11 +1,9 @@
-<script type="text/javascript">
-  function goto(url) {
-    popUpObj=window.open(url,"ModalPopUp","width=800," + "height=600");
-    popUpObj.focus();
-  }
-</script>
-<%= attrib.inspect %>
-<hr/>
 <%= label attrib.id, "#{field_options[:label]}" %>
 <%= text_field :batch_connect_session_context, attrib.id, class: 'form-control' %>
-<%= button_tag 'Select Path', type: 'button', class: 'btn btn-primary', style: 'margin-top: 15px;', onclick: 'goto("/pun/dev/dashboard/files/fs/users/PZS0714/gbyrket");' %>
+<%= button_tag 'Select Path', type: 'button', class: 'btn btn-primary', style: 'margin-top: 15px;' %>
+
+<%= javascript_include_tag 'navigator', nonce: true %>
+<div id='divNavigator'>
+  <%= render partial: "files/inline_js", locals: { navigator: true } %>
+  <%= render partial: "files/files_table", locals: { navigator: true } %>
+</div>

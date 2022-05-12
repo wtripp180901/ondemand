@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="<%= Configuration.locale %>">
+<head>
+  <title></title>
+  <%= javascript_include_tag 'application', nonce: true %>
+  <%= stylesheet_link_tag 'application', nonce: true, media: 'all' %>
+
+  <%= csrf_meta_tags %>
+
+  <%= yield :head %>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- configuration options exposed to javascript -->
+  <meta id="ood_config"
+    data-bg-color="<%= Configuration.brand_bg_color %>"
+    data-link-bg-color="<%= Configuration.brand_link_active_bg_color %>"
+  />
+</head>
+<body>
+  <header>
+  </header>
+
+  <div class="<%= local_assigns[:layout_container_class] || 'container-md' %> content mt-4" role="main">
+    <%= yield %>
+  </div><!-- /.container -->
+
+</body>
+</html>

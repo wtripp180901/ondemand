@@ -3,20 +3,26 @@
   <div style="margin-top: 20px">
 
     <ol id="path-breadcrumbs" class="breadcrumb breadcrumb-no-delimiter">
-      <%= render partial: 'breadcrumb', collection: @path.descend, as: :file, locals: { file_count: @path.descend.count, full_path: @path } %>
+      <% if @path %>
+        <%= render partial: 'breadcrumb', collection: @path.descend, as: :file, locals: { file_count: @path.descend.count, full_path: @path } %>
+      <% end %>
     </ol>
 
     <table class="table table-striped table-condensed" id="directory-contents" style="width:100%">
       <thead>
         <tr>
-          <th><span class="sr-only">Select</span></th>
-          <th>Type</th>
-          <th>Name</th>
-          <th><span class="sr-only">Actions</span></th>
-          <th>Size</th>
-          <th>Modified at</th>
-          <th>Owner</th>
-          <th>Mode</th>
+          <% if defined?(navigator) and navigator %>
+            <th>Name</th>
+          <% else %>
+            <th><span class="sr-only">Select</span></th>
+            <th>Type</th>
+            <th>Name</th>
+            <th><span class="sr-only">Actions</span></th>
+            <th>Size</th>
+            <th>Modified at</th>
+            <th>Owner</th>
+            <th>Mode</th>
+          <% end %>
         </tr>
       </thead>
       <tbody>

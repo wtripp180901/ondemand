@@ -1,9 +1,12 @@
 import Handlebars from 'handlebars';
-import {EVENTNAME as SWAL_EVENTNAME} from './sweet_alert.js';
+import { EVENTNAME as SWAL_EVENTNAME } from './sweet_alert.js';
+import _ from 'lodash';
 
 export { CONTENTID, EVENTNAME };
 
 const EVENTNAME = {
+    changeDirectory: 'changeDirectory',
+    changeDirectoryPrompt: 'changeDirectoryPrompt',
     getJsonResponse: 'getJsonResponse',
     reloadTable: 'reloadTable',
     goto: 'goto',
@@ -16,11 +19,59 @@ let table = null;
 jQuery(function () {
     table = new DataTable();
 
+    $('#directory-contents tbody, #path-breadcrumbs, #favorites').on('click', 'a.d', function (event) {
+        if (table.clickEventIsSignificant(event)) {
+            event.preventDefault();
+            event.cancelBubble = true;
+
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }
+
+            let a = this.parentElement.querySelector('a');
+            if (a.classList.contains('d')) {
+                table.goto(a.getAttribute("href"));
+            }
+    
+        }
+    });
+
+    $('#directory-contents tbody').on('dblclick', 'tr td:not(:first-child)', function (event) {
+        // handle doubleclick
+        if (table.clickEventIsSignificant(event)) {
+            event.preventDefault();
+            event.cancelBubble = true;
+
+            if (event.stopPropagation) {
+                event.stopPropagation();
+            }
+
+            let a = this.parentElement.querySelector('a');
+            if (a.classList.contains('d')) {
+                table.goto(a.getAttribute("href"));
+            }
+    
+        }
+    });
+
+    $(document).on("click", '#goto-btn', function () {
+        $(CONTENTID).trigger(EVENTNAME.changeDirectoryPrompt);
+    });
+
 
     /* END BUTTON ACTIONS */
 
     /* TABLE ACTIONS */
-    
+
+    $(CONTENTID).on(EVENTNAME.changeDirectoryPrompt, function () {
+        table.changeDirectoryPrompt();
+    });
+
+    $(CONTENTID).on(EVENTNAME.changeDirectory, function (e, options) {
+        table.changeDirectory(options.result.value);
+    });
+
+
     $(CONTENTID).on(EVENTNAME.reloadTable, function (e, options) {
         let url = $.isEmptyObject(options) ? '' : options.url;
         table.reloadTable(url);
@@ -239,33 +290,35 @@ class DataTable {
     }
 
     async reloadTable(url) {
-        var request_url = url || history.state.currentDirectoryUrl;
+        let request_url = url || history.state.currentDirectoryUrl;        
 
-        try {
-            const response = await fetch(request_url, { headers: { 'Accept': 'application/json' } });
-            const data = await this.dataFromJsonResponse(response);
-            $('#shell-wrapper').replaceWith((data.shell_dropdown_html));
+        if (request_url) {
+            try {
+                const response = await fetch(request_url, { headers: { 'Accept': 'application/json' } });
+                const data = await this.dataFromJsonResponse(response);
+                $('#shell-wrapper').replaceWith((data.shell_dropdown_html));
 
-            this._table.clear();
-            this._table.rows.add(data.files);
-            this._table.draw();
+                this._table.clear();
+                this._table.rows.add(data.files);
+                this._table.draw();
 
-            $('#open-in-terminal-btn').attr('href', data.shell_url);
-            $('#open-in-terminal-btn').removeClass('disabled');
+                $('#open-in-terminal-btn').attr('href', data.shell_url);
+                $('#open-in-terminal-btn').removeClass('disabled');
 
-            return await Promise.resolve(data);
-        } catch (e) {
-            const eventData = {
-                'title': `Error occurred when attempting to access ${request_url}`,
-                'message': e.message,
-            };
+                return await Promise.resolve(data);
+            } catch (e) {
+                const eventData = {
+                    'title': `Error occurred when attempting to access ${request_url}`,
+                    'message': e.message,
+                };
 
-            $(CONTENTID).trigger(SWAL_EVENTNAME.showError, eventData);
+                $(CONTENTID).trigger(SWAL_EVENTNAME.showError, eventData);
 
-            $('#open-in-terminal-btn').addClass('disabled');
-            
-            // Removed this as it was causing a JS Error and there is no reprocution from removing it.
-            // return await Promise.reject(e);
+                $('#open-in-terminal-btn').addClass('disabled');
+
+                // Removed this as it was causing a JS Error and there is no reprocution from removing it.
+                // return await Promise.reject(e);
+            }
         }
     }
 
@@ -309,9 +362,12 @@ class DataTable {
     }
 
     actionsBtnTemplate(options) {
+        let results = null;
         let template_str = $('#actions-btn-template').html();
-        let compiled = Handlebars.compile(template_str);
-        let results = compiled(options);
+        if(template_str) {
+            let compiled = Handlebars.compile(template_str);
+            results = compiled(options);    
+        }
         return results;
     }
 
@@ -326,29 +382,79 @@ class DataTable {
     }
 
     goto(url, pushState = true, show_processing_indicator = true) {
-        if(url == history.state.currentDirectoryUrl)
-          pushState = false;
-      
+        if (url == history.state.currentDirectoryUrl)
+            pushState = false;
+
         this.reloadTable(url)
-          .then((data) => {
-            if(data) {
-                $('#path-breadcrumbs').html(data.breadcrumbs_html);
-                if(pushState) {
-                    // Clear search query when moving to another directory.
-                    this._table.search('').draw();
-            
-                    history.pushState({
-                        currentDirectory: data.path,
-                        currentDirectoryUrl: data.url
-                    }, data.name, data.url);
-                }      
+            .then((data) => {
+                if (data) {
+                    $('#path-breadcrumbs').html(data.breadcrumbs_html);
+                    if (pushState) {
+                        // Clear search query when moving to another directory.
+                        this._table.search('').draw();
+
+                        history.pushState({
+                            currentDirectory: data.path,
+                            currentDirectoryUrl: data.url
+                        }, data.name, data.url);
+                    }
+                }
+            })
+            .finally(() => {
+                //TODO: after processing is available via ActiveJobs merge
+                // if(show_processing_indicator)
+                //   table.processing(false)
+            });
+    }
+
+
+    changeDirectory(path) {
+        this.goto(filesPath + path);
+        // const eventData = {
+        //   'path': filesPath + path,
+        // };
+
+        // $(CONTENTID).trigger(DATATABLE_EVENTNAME.goto, eventData);
+
+    }
+
+    changeDirectoryPrompt() {
+        const eventData = {
+            action: 'changeDirectory',
+            'inputOptions': {
+                title: 'Change Directory',
+                input: 'text',
+                inputLabel: 'Path',
+                inputValue: history.state.currentDirectory,
+                inputAttributes: {
+                    spellcheck: 'false',
+                },
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    if (!value || !value.startsWith('/')) {
+                        // TODO: validate filenames against listing
+                        return 'Provide an absolute pathname'
+                    }
+                }
             }
-          })
-          .finally(() => {
-            //TODO: after processing is available via ActiveJobs merge
-            // if(show_processing_indicator)
-            //   table.processing(false)
-          });
-      }    
+        };
+
+        $(CONTENTID).trigger(SWAL_EVENTNAME.showInput, eventData);
+
+    }
+
+    clickEventIsSignificant(event) {
+        return !(
+            // (event.target && (event.target as any).isContentEditable)
+            event.defaultPrevented
+            || event.which > 1
+            || event.altKey
+            || event.ctrlKey
+            || event.metaKey
+            || event.shiftKey
+        )
+    }
+
+
 
 }

@@ -7,8 +7,6 @@ import _ from 'lodash';
 export {EVENTNAME};
 
 const EVENTNAME = {
-  changeDirectory: 'changeDirectory',
-  changeDirectoryPrompt: 'changeDirectoryPrompt',
   copyFile: 'copyFile',
   createFile: 'createFile',
   createDirectory: 'createDirectory',
@@ -29,33 +27,6 @@ let fileOps = null;
 
 jQuery(function() {
   fileOps = new FileOps();  
-
-  $('#directory-contents tbody, #path-breadcrumbs, #favorites').on('click', 'a.d', function(event){
-    if(fileOps.clickEventIsSignificant(event)){
-      event.preventDefault();
-      event.cancelBubble = true;
-      if(event.stopPropagation) event.stopPropagation();
-
-      const eventData = {
-        'path': this.getAttribute("href"),
-      };
-  
-      $(CONTENTID).trigger(DATATABLE_EVENTNAME.goto, eventData);
-  
-    }
-  });
-  
-  $('#directory-contents tbody').on('dblclick', 'tr td:not(:first-child)', function(){
-    // handle doubleclick
-    let a = this.parentElement.querySelector('a');
-    if(a.classList.contains('d')) {
-      const eventData = {
-        'path': a.getAttribute("href"),
-      };
-  
-      $(CONTENTID).trigger(DATATABLE_EVENTNAME.goto, eventData);
-    }
-  });
 
   $("#new-file-btn").on("click", function () {
     $(CONTENTID).trigger(EVENTNAME.newFilePrompt);
@@ -86,10 +57,6 @@ jQuery(function() {
 
     $(CONTENTID).trigger(EVENTNAME.deletePrompt, eventData);
 
-  });
-
-  $(document).on("click", '#goto-btn', function () {
-      $(CONTENTID).trigger(EVENTNAME.changeDirectoryPrompt);
   });
 
   $(document).on('click', '.rename-file', function (e) {
@@ -186,68 +153,13 @@ jQuery(function() {
     fileOps.copy(options.files, options.token);
   });
 
-  $(CONTENTID).on(EVENTNAME.changeDirectoryPrompt, function () {
-    fileOps.changeDirectoryPrompt();
-  });
-
-  $(CONTENTID).on(EVENTNAME.changeDirectory, function (e, options) {
-    fileOps.changeDirectory(options.result.value);
-  });
-
 });
 
 class FileOps {
   _timeout = 2000;
   _attempts = 0;
-  _filesPath = filesPath;
 
   constructor() {
-  }
-
-  clickEventIsSignificant(event) {
-    return !(
-      // (event.target && (event.target as any).isContentEditable)
-         event.defaultPrevented
-      || event.which > 1
-      || event.altKey
-      || event.ctrlKey
-      || event.metaKey
-      || event.shiftKey
-    )
-  }
-
-  changeDirectory(path) {
-    const eventData = {
-      'path': filesPath + path,
-    };
-
-    $(CONTENTID).trigger(DATATABLE_EVENTNAME.goto, eventData);
-
-  }
-
-  changeDirectoryPrompt() {
-    const eventData = {
-      action: 'changeDirectory',
-      'inputOptions': {
-        title: 'Change Directory',
-        input: 'text',
-        inputLabel: 'Path',
-        inputValue:  history.state.currentDirectory,
-        inputAttributes: {
-          spellcheck: 'false',
-        },
-        showCancelButton: true,
-        inputValidator: (value) => {
-          if (! value || ! value.startsWith('/')) {
-            // TODO: validate filenames against listing
-            return 'Provide an absolute pathname'
-          }
-        }
-      }
-    };
-
-    $(CONTENTID).trigger(SWAL_EVENTNAME.showInput, eventData);
-
   }
 
   deletePrompt(files) {
