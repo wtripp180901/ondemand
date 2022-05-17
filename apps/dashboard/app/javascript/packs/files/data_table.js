@@ -245,17 +245,32 @@ class DataTable {
                     data: null,
                     orderable: false,
                     defaultContent: '<input type="checkbox">',
+                    visible: navigator == "true" ? false : true,
                 },
-                { data: 'type', render: (data, type, row, meta) => data == 'd' ? '<span title="directory" class="fa fa-folder" style="color: gold"><span class="sr-only"> dir</span></span>' : '<span title="file" class="fa fa-file" style="color: lightgrey"><span class="sr-only"> file</span></span>' }, // type
-                { name: 'name', data: 'name', className: 'text-break', render: (data, type, row, meta) => `<a class="${row.type} name ${row.type == 'd' ? '' : 'view-file'}" href="${row.url}">${Handlebars.escapeExpression(data)}</a>` }, // name
-                { name: 'actions', orderable: false, data: null, render: (data, type, row, meta) => this.actionsBtnTemplate({ row_index: meta.row, file: row.type != 'd', data: row }) },
+                { 
+                    data: 'type', 
+                    visible: navigator == "true" ? false : true,
+                    render: (data, type, row, meta) => data == 'd' ? '<span title="directory" class="fa fa-folder" style="color: gold"><span class="sr-only"> dir</span></span>' : '<span title="file" class="fa fa-file" style="color: lightgrey"><span class="sr-only"> file</span></span>' 
+                }, // type
+                { 
+                    name: 'name', 
+                    data: 'name', 
+                    visible: true,
+                    className: 'text-break', render: (data, type, row, meta) => `<a class="${row.type} name ${row.type == 'd' ? '' : 'view-file'}" href="${row.url}">${Handlebars.escapeExpression(data)}</a>` }, // name
+                { 
+                    name: 'actions', 
+                    orderable: false,
+                    visible: navigator == "true" ? false : true, 
+                    data: null, render: (data, type, row, meta) => this.actionsBtnTemplate({ row_index: meta.row, file: row.type != 'd', data: row }) },
                 {
                     data: 'size',
+                    visible: navigator == "true" ? false : true,
                     render: (data, type, row, meta) => {
                         return type == "display" ? row.human_size : data;
                     }
                 }, // human_size
                 {
+                    visible: navigator == "true" ? false : true,
                     data: 'modified_at', render: (data, type, row, meta) => {
                         if (type == "display") {
                             let date = new Date(data * 1000)
@@ -268,9 +283,15 @@ class DataTable {
                         }
                     }
                 }, // modified_at
-                { name: 'owner', data: 'owner', visible: this.getShowOwnerMode() }, // owner
+                { 
+                    name: 'owner', 
+                    data: 'owner', 
+                    visible: this.getShowOwnerMode() && navigator != "true", // owner
+                },
                 {
-                    name: 'mode', data: 'mode', visible: this.getShowOwnerMode(), render: (data, type, row, meta) => {
+                    name: 'mode', data: 'mode', 
+                    visible: this.getShowOwnerMode() && navigator != "true", 
+                    render: (data, type, row, meta) => {
 
                         // mode after base conversion is a string such as "100755"
                         let mode = data.toString(8)
@@ -284,18 +305,21 @@ class DataTable {
             ]
         });
 
-        $('#directory-contents_filter').prepend(`<label style="margin-right: 20px" for="show-dotfiles"><input type="checkbox" id="show-dotfiles" ${this.getShowDotFiles() ? 'checked' : ''}> Show Dotfiles</label>`)
-        $('#directory-contents_filter').prepend(`<label style="margin-right: 14px" for="show-owner-mode"><input type="checkbox" id="show-owner-mode" ${this.getShowOwnerMode() ? 'checked' : ''}> Show Owner/Mode</label>`)
-
+        if(navigator != "true") {
+            $('#directory-contents_filter').prepend(`<label style="margin-right: 20px" for="show-dotfiles"><input type="checkbox" id="show-dotfiles" ${this.getShowDotFiles() ? 'checked' : ''}> Show Dotfiles</label>`)
+            $('#directory-contents_filter').prepend(`<label style="margin-right: 14px" for="show-owner-mode"><input type="checkbox" id="show-owner-mode" ${this.getShowOwnerMode() ? 'checked' : ''}> Show Owner/Mode</label>`)
+        }
     }
 
     async reloadTable(url) {
-        let request_url = url || history.state.currentDirectoryUrl;        
-
+        let request_url = url || history.state.currentDirectoryUrl;  
+        console.log('reloadTable: ' + request_url);
         if (request_url) {
             try {
                 const response = await fetch(request_url, { headers: { 'Accept': 'application/json' } });
                 const data = await this.dataFromJsonResponse(response);
+                console.log('DATA');
+                console.log(data);
                 $('#shell-wrapper').replaceWith((data.shell_dropdown_html));
 
                 this._table.clear();

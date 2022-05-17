@@ -11,9 +11,6 @@
     <table class="table table-striped table-condensed" id="directory-contents" style="width:100%">
       <thead>
         <tr>
-          <% if defined?(navigator) and navigator %>
-            <th>Name</th>
-          <% else %>
             <th><span class="sr-only">Select</span></th>
             <th>Type</th>
             <th>Name</th>
@@ -22,7 +19,6 @@
             <th>Modified at</th>
             <th>Owner</th>
             <th>Mode</th>
-          <% end %>
         </tr>
       </thead>
       <tbody>
