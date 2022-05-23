@@ -23,6 +23,6 @@
     <%= render partial: "file_action_menu" %>
     <%= render partial: "default_label_error_messages" %>
   </div>
-  <%= render partial: "files_table" %>
+  <%= render partial: "files_table", locals: { navigator: true, path: @path } %>
 </div>
-<%= render partial: "inline_js" %>
+<%= render partial: "files/inline_js", locals: { navigator: false } %>

@@ -313,13 +313,10 @@ class DataTable {
 
     async reloadTable(url) {
         let request_url = url || history.state.currentDirectoryUrl;  
-        console.log('reloadTable: ' + request_url);
         if (request_url) {
             try {
                 const response = await fetch(request_url, { headers: { 'Accept': 'application/json' } });
                 const data = await this.dataFromJsonResponse(response);
-                console.log('DATA');
-                console.log(data);
                 $('#shell-wrapper').replaceWith((data.shell_dropdown_html));
 
                 this._table.clear();
@@ -396,13 +393,15 @@ class DataTable {
     }
 
     updateDatatablesStatus() {
-        // from "function info ( api )" of https://cdn.datatables.net/select/1.3.1/js/dataTables.select.js
-        let api = this._table;
-        let rows = api.rows({ selected: true }).flatten().length,
-            page_info = api.page.info(),
-            msg = page_info.recordsTotal == page_info.recordsDisplay ? `Showing ${page_info.recordsDisplay} rows` : `Showing ${page_info.recordsDisplay} of ${page_info.recordsTotal} rows`;
+        if( navigator != "true" ) {
+            // from "function info ( api )" of https://cdn.datatables.net/select/1.3.1/js/dataTables.select.js
+            let api = this._table;
+            let rows = api.rows({ selected: true }).flatten().length,
+                page_info = api.page.info(),
+                msg = page_info.recordsTotal == page_info.recordsDisplay ? `Showing ${page_info.recordsDisplay} rows` : `Showing ${page_info.recordsDisplay} of ${page_info.recordsTotal} rows`;
 
-        $('.datatables-status').html(`${msg} - ${rows} rows selected`);
+            $('.datatables-status').html(`${msg} - ${rows} rows selected`);
+        }
     }
 
     goto(url, pushState = true, show_processing_indicator = true) {

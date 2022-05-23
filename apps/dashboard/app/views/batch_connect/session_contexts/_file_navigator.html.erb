@@ -1,9 +1,9 @@
 <%= label attrib.id, "#{field_options[:label]}" %>
 <%= text_field :batch_connect_session_context, attrib.id, class: 'form-control' %>
-<%= button_tag 'Select Path', type: 'button', class: 'btn btn-primary', style: 'margin-top: 15px;' %>
+<%= button_tag 'Select Path', id: 'btnNavigate', type: 'button', class: 'btn btn-primary', style: 'margin-top: 15px;' %>
 
 <%= javascript_include_tag 'navigator', nonce: true %>
-<div id='divNavigator'>
+<div id='divNavigator' style='display:none;'>
   <%= render partial: "files/inline_js", locals: { navigator: true } %>
-  <%= render partial: "files/files_table" %>
+  <%= render partial: "files/files_table", locals: { navigator: true, path: @path } %>
 </div>

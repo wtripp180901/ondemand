@@ -1,6 +1,16 @@
-import {} from './files/data_table.js';
+import {CONTENTID, EVENTNAME as DATATABLE_EVENTNAME} from './files/data_table.js';
 
 jQuery(function() {
-  console.log('HERE');
+  jQuery('#btnNavigate').on("click", function() {
+    
+    jQuery("#divNavigator").show();
+
+    // const eventDataDT = {
+    //   'url': '/pun/dev/dashboard/files/fs//users/PZS0714/gbyrket',
+    // };
+
+    // jQuery(CONTENTID).trigger(DATATABLE_EVENTNAME.reloadTable, eventDataDT);
+
+  });
 });
 

@@ -20,6 +20,8 @@ class BatchConnect::SessionContextsController < ApplicationController
 
     set_app_groups
     set_my_quotas
+    @path = PosixFile.new(normalized_path)
+    Rails.logger.debug('PATH: ' + @path.inspect)
   end
 
   # POST /batch_connect/<app_token>/session_contexts
@@ -50,6 +52,12 @@ class BatchConnect::SessionContextsController < ApplicationController
   end
 
   private
+
+    def normalized_path
+      Pathname.new("/users/PZS0714/gbyrket")
+    end
+
+
     # Set the app from the token
     def set_app
       @app = BatchConnect::App.from_token params[:token]
