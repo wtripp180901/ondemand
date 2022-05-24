@@ -5,6 +5,7 @@
   </li>
 <% end %>
 <% navigator = navigator %>
+<h1>Navigator: <%= navigator %></h1>
 <% if file_counter == (file_count - 1) %>
   <li class="breadcrumb-item">
     <%= path_segment_with_slash(file.basename.to_s, file_counter, file_count) %>

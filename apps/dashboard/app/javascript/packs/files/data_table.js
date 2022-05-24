@@ -17,6 +17,7 @@ const CONTENTID = '#directory-contents';
 let table = null;
 
 jQuery(function () {
+    console.log('DT navigator: ' + navigator);
     table = new DataTable();
 
     $('#directory-contents tbody, #path-breadcrumbs, #favorites').on('click', 'a.d', function (event) {
@@ -407,6 +408,8 @@ class DataTable {
     goto(url, pushState = true, show_processing_indicator = true) {
         if (url == history.state.currentDirectoryUrl)
             pushState = false;
+
+        console.log('goto url: ' + url);
 
         this.reloadTable(url)
             .then((data) => {
