@@ -17,7 +17,6 @@ const CONTENTID = '#directory-contents';
 let table = null;
 
 jQuery(function () {
-    console.log('DT navigator: ' + navigator);
     table = new DataTable();
 
     $('#directory-contents tbody, #path-breadcrumbs, #favorites').on('click', 'a.d', function (event) {
@@ -202,6 +201,7 @@ class DataTable {
     _table = null;
 
     constructor() {
+        console.log('__CON navigator: ' + navigator);
         this.loadDataTable();
         this.reloadTable();
     }
@@ -251,7 +251,16 @@ class DataTable {
                 { 
                     data: 'type', 
                     visible: navigator == "true" ? false : true,
-                    render: (data, type, row, meta) => data == 'd' ? '<span title="directory" class="fa fa-folder" style="color: gold"><span class="sr-only"> dir</span></span>' : '<span title="file" class="fa fa-file" style="color: lightgrey"><span class="sr-only"> file</span></span>' 
+                    render: (data, type, row, meta) => {
+                        let output = '';
+                        if( data == 'd' ) {
+                            output = '<span title="directory" class="fa fa-folder" style="color: gold"><span class="sr-only"> dir</span></span>';
+                        } else if ( navigator != "true" ) {
+                            output = '<span title="file" class="fa fa-file" style="color: lightgrey"><span class="sr-only"> file</span></span>';
+                        }
+
+                        return output;
+                    },
                 }, // type
                 { 
                     name: 'name', 
@@ -313,13 +322,17 @@ class DataTable {
     }
 
     async reloadTable(url) {
-        let request_url = url || history.state.currentDirectoryUrl;  
+        let request_url = url || history.state.currentDirectoryUrl;
+        if(navigator == "true") {
+            request_url = request_url.replace('/fs/','/navigate/');
+            console.log('REQUEST URL: ' + request_url);
+        }  
         if (request_url) {
             try {
                 const response = await fetch(request_url, { headers: { 'Accept': 'application/json' } });
                 const data = await this.dataFromJsonResponse(response);
                 $('#shell-wrapper').replaceWith((data.shell_dropdown_html));
-
+                console.log('DATA: ' + data);
                 this._table.clear();
                 this._table.rows.add(data.files);
                 this._table.draw();
@@ -409,12 +422,12 @@ class DataTable {
         if (url == history.state.currentDirectoryUrl)
             pushState = false;
 
-        console.log('goto url: ' + url);
-
         this.reloadTable(url)
             .then((data) => {
                 if (data) {
                     $('#path-breadcrumbs').html(data.breadcrumbs_html);
+                    $('#path-breadcrumbs').show();
+
                     if (pushState) {
                         // Clear search query when moving to another directory.
                         this._table.search('').draw();

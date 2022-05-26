@@ -102,6 +102,30 @@ class FilesController < ApplicationController
     end
   end
 
+  def navigate
+    request.format = 'json' if request.headers['HTTP_ACCEPT'].split(',').include?('application/json')
+
+    @path = PosixFile.new(normalized_path)
+
+    AllowlistPolicy.default.validate!(@path)
+
+    if @path.directory?
+      @path.raise_if_cant_access_directory_contents
+
+      respond_to do |format|
+
+        format.html do
+          render :navigate
+        end
+
+        format.json do
+          @files = @path.ls
+          render :navigate
+        end
+      end
+    end
+  end
+
   # PUT - create or update
   def update
     path = normalized_path
