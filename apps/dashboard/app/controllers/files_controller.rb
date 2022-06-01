@@ -110,8 +110,8 @@ class FilesController < ApplicationController
     AllowlistPolicy.default.validate!(@path)
 
     if @path.directory?
-      @path.raise_if_cant_access_directory_contents
 
+      @path.raise_if_cant_access_directory_contents
       respond_to do |format|
 
         format.html do
@@ -119,7 +119,14 @@ class FilesController < ApplicationController
         end
 
         format.json do
-          @files = @path.ls
+          @holder = @path.ls
+          @files = []
+
+          @holder.each { |f|
+            if f[:directory] == true
+              @files.push(f)
+            end
+          }
           render :navigate
         end
       end
