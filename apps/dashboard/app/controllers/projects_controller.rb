@@ -28,13 +28,15 @@ class ProjectsController < ApplicationController
 
   # PATCH /projects/:id
   def update
-    @project = Project.find(params[:id])
+    returned_params = { :id => params[:id], :name => params[:project][:name], :icon => params[:project][:icon], :description => params[:project][:description] }
+    @project = Project.new(returned_params)
+    Rails.logger.debug('GWB: ' + @project.inspect)
 
     if @project.valid? && @project.update(project_params)
       redirect_to projects_path, notice: I18n.t('dashboard.jobs_project_manifest_updated')
     else
       flash[:alert] = @project.errors[:name].last || @project.errors[:icon].last
-      redirect_to edit_project_path
+      render :edit
     end
   end
 

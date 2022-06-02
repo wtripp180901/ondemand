@@ -57,6 +57,7 @@ class Project
 
   def update(attributes)
     if valid_form_inputs?(attributes)
+      Rails.logger.debug('GWB MANIFEST PATH: ' + manifest_path)
       new_manifest = Manifest.load(manifest_path)
       new_manifest = new_manifest.merge(attributes)
 
