@@ -30,12 +30,12 @@ Rails.application.routes.draw do
 
   if Configuration.can_access_files?
     constraints filepath: /.+/ do
-      get "files/navigate(/*filepath)" => "files#navigate", :defaults => { :format => 'html', :filepath => '/' }, :format => false, as: :navigateFiles
+      get "files/navigate(/*filepath)" => "files#navigate", :defaults => { :format => 'html', :filepath => '#{Dir.home}' }, :format => false, as: :navigateFiles
 
       # TODO: deprecate these routes after updating OodAppkit to use the new routes above
       # backwards compatibility with the "api" routes that OodAppkit provides
       # and are used by File Editor and Job Composer
-      get "files/api/v1/fs(/*filepath)" => "files#navigate", :defaults => { :format => 'html', :filepath => '/' }, :format => false
+      get "files/api/v1/fs(/*filepath)" => "files#navigate", :defaults => { :format => 'html', :filepath => '#{Dir.home}' }, :format => false
     end
 
     get "navigateFiles", to: redirect("files/navigate#{Dir.home}")

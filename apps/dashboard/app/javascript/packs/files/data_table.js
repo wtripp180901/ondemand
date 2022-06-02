@@ -18,7 +18,9 @@ let table = null;
 
 jQuery(function () {
     table = new DataTable();
-
+    console.log('Current Dir: ' + currentDirectory);
+    $('#batch_connect_session_context_workingDirectory').value(currentDirectory);
+  
     $('#directory-contents tbody, #path-breadcrumbs, #favorites').on('click', 'a.d', function (event) {
         if (table.clickEventIsSignificant(event)) {
             event.preventDefault();

@@ -54,7 +54,7 @@ class BatchConnect::SessionContextsController < ApplicationController
   private
 
     def normalized_path
-      Pathname.new("/users/PZS0714/gbyrket")
+      Pathname.new(Dir.home)
     end
 
 
