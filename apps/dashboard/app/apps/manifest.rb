@@ -157,9 +157,7 @@ category: OSC
   #
   # @return [true, false] true if the file is saved successfully
   def save(path)
-
     Pathname.new(path).write(self.to_yaml)
-
     true
   rescue
     # TODO Add a custom exception here to track why it erred. IO? Permissions? etc.

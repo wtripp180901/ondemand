@@ -9,7 +9,17 @@ class Project
       return [] unless dataroot.directory? && dataroot.executable? && dataroot.readable?
 
       dataroot.children.map do |d|
-        Project.new({ :name => d.basename })
+        # d.basename = test-of-gerald
+        # get path to manifest
+        # load manifest
+        # 
+        # project_name = Psych.load_file(d.basename.join('./ondemand/manifest', symbolize_names: true))[:name]
+
+        base_name = d.join('./.ondemand/manifest.yml')
+        Rails.logger.debug('GWB - BASE Name: ' + base_name.inspect) 
+        manifest_data = Psych.load_file(base_name)
+        Rails.logger.debug('GWB - Manifest Data: ' + manifest_data.inspect)
+        Project.new({ :id => d.basename, :name => manifest_data["name"] })
       rescue StandardError => e
         Rails.logger.warn("Didn't create project. #{e.message}")
         nil
@@ -46,8 +56,17 @@ class Project
   delegate :icon, :name, :description, to: :manifest
 
   def initialize(attributes = {})
-    @directory = attributes.delete(:project_directory) || attributes[:name].to_s.downcase.tr_s(' ', '_')
-    @manifest  = Manifest.new(attributes).merge(Manifest.load(manifest_path))
+    Rails.logger.debug('GWB - initialize: ' + attributes.inspect)
+    if attributes[:project_directory].nil?
+      @directory = attributes.delete(:project_directory) || attributes[:name].to_s.downcase.tr_s(' ', '_')      
+    else
+      @directory = attributes.delete(:project_directory) || attributes[:id]
+    end
+    originalManifest = Manifest.load(manifest_path)
+    Rails.logger.debug('GWB - initialize - originalManifest: ' + @originalManifest.inspect)
+    @manifest  = Manifest.new(attributes)
+    Rails.logger.debug('GWB - initialize - Manifest: ' + @manifest.inspect)
+
   end
 
   def save(attributes)

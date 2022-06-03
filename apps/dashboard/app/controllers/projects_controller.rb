@@ -24,11 +24,13 @@ class ProjectsController < ApplicationController
   # GET /projects/:id/edit
   def edit
     @project = Project.find(params[:id])
+    Rails.logger.debug('GWB edit: ' + @project.inspect)
   end
 
   # PATCH /projects/:id
   def update
     returned_params = { :id => params[:id], :name => params[:project][:name], :icon => params[:project][:icon], :description => params[:project][:description] }
+    Rails.logger.debug('GWB update: ' + returned_params.inspect)
     @project = Project.new(returned_params)
     Rails.logger.debug('GWB: ' + @project.inspect)
 
