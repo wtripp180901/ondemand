@@ -9,6 +9,7 @@ class ProjectsController < ApplicationController
   # GET /projects
   def index
     @projects = Project.all
+    Rails.logger.debug('GWB index: ' + @projects.inspect)
   end
 
   # GET /projects/new

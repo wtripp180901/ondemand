@@ -20,6 +20,7 @@ class Project
         manifest_data = Psych.load_file(base_name)
         Rails.logger.debug('GWB - Manifest Data: ' + manifest_data.inspect)
         Project.new({ :id => d.basename, :name => manifest_data["name"] })
+        Rails.logger.debug('GWB - ALL PROJECT Data: ' + manifest_data.inspect)
       rescue StandardError => e
         Rails.logger.warn("Didn't create project. #{e.message}")
         nil

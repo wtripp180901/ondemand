@@ -102,6 +102,13 @@ category: OSC
     @manifest_options[:category] || ""
   end
 
+  # Return the id value in manifest_options
+  #
+  # @return [String] id as string
+  def id
+    @manifest_options[:id] || ""
+  end
+
   # Return the app subcategory
   #
   # @return [String] subcategory as string
