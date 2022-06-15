@@ -1,0 +1,9 @@
+
+<%# z-index:999 cause dropdowns are 1000 default sticky-top is 1020 https://getbootstrap.com/docs/4.6/layout/overview/#z-index %>
+<div class="row">
+  <div class="col-md-3">
+    <%= render partial: "favorites" %>
+  </div>
+  <%= render partial: "files/inline_js", locals: { navigator: true } %>  
+  <%= render partial: "files/files_table", locals: {  navigator: true, path: @path } %>
+</div>
