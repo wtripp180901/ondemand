@@ -325,16 +325,11 @@ class DataTable {
 
     async reloadTable(url) {
         let request_url = url || history.state.currentDirectoryUrl;
-        if(navigator == "true") {
-            request_url = request_url.replace('/fs/','/navigate/');
-            console.log('REQUEST URL: ' + request_url);
-        }  
         if (request_url) {
             try {
                 const response = await fetch(request_url, { headers: { 'Accept': 'application/json' } });
                 const data = await this.dataFromJsonResponse(response);
                 $('#shell-wrapper').replaceWith((data.shell_dropdown_html));
-                console.log('DATA: ' + data);
                 this._table.clear();
                 this._table.rows.add(data.files);
                 this._table.draw();
