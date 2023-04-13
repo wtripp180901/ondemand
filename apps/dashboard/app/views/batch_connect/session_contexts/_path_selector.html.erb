@@ -5,7 +5,7 @@ end
 %>
 
 <%= label attrib.id, "#{field_options[:label]}" %>
-<%= text_field :batch_connect_session_context, attrib.id, class: 'form-control' %>
+<%= text_field :batch_connect_session_context, "working_dir", class: 'form-control' %>
 <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#modal-path-selector" id='select-nav-path'>
   Select Path
 </button>

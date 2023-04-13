@@ -17,7 +17,6 @@ const BUTTONSELECTPATH = "#button-select-path";
 const WORKINGDIRECTORY = "#batch_connect_session_context_working_dir";
 let table = null;
 
-
 jQuery(function () {
     table = new DataTable();
 
